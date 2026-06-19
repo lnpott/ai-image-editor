@@ -1,41 +1,107 @@
 "use client";
-import {useState} from "react";
 
-export default function Home(){
- const [prompt,setPrompt]=useState("");
- const [image,setImage]=useState<string>("");
- const [msg,setMsg]=useState("");
+import { useState } from "react";
 
- async function run(){
-  const r=await fetch('/api/gemini',{
-   method:'POST',
-   headers:{'Content-Type':'application/json'},
-   body:JSON.stringify({prompt,image})
-  });
-  const j=await r.json();
-  setMsg(j.text || j.error || 'Finalizado');
- }
+export default function Home() {
+  const [image, setImage] = useState("");
+  const [result, setResult] = useState("");
+  const [loading, setLoading] = useState(false);
 
- function loadImage(e:any){
-  const f=e.target.files?.[0];
-  if(!f) return;
-  const reader=new FileReader();
-  reader.onload=()=>setImage(reader.result as string);
-  reader.readAsDataURL(f);
- }
+  function loadImage(e: any) {
+    const file = e.target.files?.[0];
 
- return <main style={{padding:40,fontFamily:'Arial'}}>
-  <h1>AI Image Editor</h1>
-  <p>Editor com IA por comandos</p>
+    if (!file) return;
 
-  <input type="file" accept="image/*" onChange={loadImage}/>
+    const reader = new FileReader();
 
-  {image && <img src={image} style={{maxWidth:500,display:'block',marginTop:20}}/>}
+    reader.onload = () => {
+      setImage(reader.result as string);
+    };
 
-  <input value={prompt} onChange={e=>setPrompt(e.target.value)} placeholder="Ex: remova o fundo e melhore a qualidade" style={{width:'80%',padding:10,marginTop:20}}/>
+    reader.readAsDataURL(file);
+  }
 
-  <button onClick={run} style={{padding:10,margin:10}}>Aplicar IA</button>
+  async function processImage() {
+    if (!image) return;
 
-  <pre>{msg}</pre>
- </main>
+    setLoading(true);
+
+    const response = await fetch("/api/process", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        image,
+        width: 2400,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (data.image) {
+      setResult(data.image);
+    }
+
+    setLoading(false);
+  }
+
+  return (
+    <main style={{ padding: 40, fontFamily: "Arial" }}>
+      <h1>AI Image Editor</h1>
+
+      <input
+        type="file"
+        accept="image/*"
+        onChange={loadImage}
+      />
+
+      <br />
+
+      {image && (
+        <>
+          <h3>Original</h3>
+          <img
+            src={image}
+            style={{ maxWidth: 500 }}
+          />
+        </>
+      )}
+
+      <br />
+
+      <button
+        onClick={processImage}
+        disabled={loading}
+        style={{
+          padding: 12,
+          marginTop: 20
+        }}
+      >
+        {loading ? "Processando..." : "Melhorar imagem"}
+      </button>
+
+
+      {result && (
+        <>
+          <h3>Resultado</h3>
+
+          <img
+            src={result}
+            style={{ maxWidth: 500 }}
+          />
+
+          <br />
+
+          <a
+            href={result}
+            download="imagem-melhorada.jpg"
+          >
+            Baixar imagem
+          </a>
+        </>
+      )}
+
+    </main>
+  );
 }
