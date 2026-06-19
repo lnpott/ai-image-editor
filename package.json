@@ -1,1 +1,1 @@
-{"scripts":{"dev":"next dev","build":"next build","start":"next start"},"dependencies":{"@google/generative-ai":"latest","next":"latest","react":"latest","react-dom":"latest","typescript":"latest","@types/node":"latest","@types/react":"latest"},"devDependencies":{}}
+{"scripts":{"dev":"next dev","build":"next build","start":"next start"},"dependencies":{"@google/generative-ai":"latest","next":"latest","react":"latest","react-dom":"latest","typescript":"latest","@types/node":"latest","@types/react":"latest","sharp":"latest"},"devDependencies":{}}
