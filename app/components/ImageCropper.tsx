@@ -11,7 +11,7 @@ interface ImageCropperProps {
 }
 
 export default function ImageCropper({ image, onCropComplete, onCancel }: ImageCropperProps) {
-  const [crop, setCrop] = useState<Crop>({ unit: '%', width: 50, height: 50, x: 25, y: 25 });
+  const [crop, setCrop] = useState<Crop>();
   const [zoom, setZoom] = useState(1);
   const [aspect, setAspect] = useState<number | undefined>(undefined);
   const imgRef = useRef<HTMLImageElement>(null);
@@ -31,7 +31,7 @@ export default function ImageCropper({ image, onCropComplete, onCancel }: ImageC
     }
   }, [aspect]);
 
-  async function handleCropComplete(crop: Crop) {
+  function handleCropComplete(crop: PixelCrop) {
     if (!imgRef.current || !crop) return;
 
     const image = imgRef.current;
@@ -43,29 +43,15 @@ export default function ImageCropper({ image, onCropComplete, onCancel }: ImageC
     const scaleX = image.naturalWidth / image.width;
     const scaleY = image.naturalHeight / image.height;
 
-    let x, y, width, height;
-
-    if (crop.unit === '%') {
-      x = (crop.x / 100) * image.naturalWidth;
-      y = (crop.y / 100) * image.naturalHeight;
-      width = (crop.width / 100) * image.naturalWidth;
-      height = (crop.height / 100) * image.naturalHeight;
-    } else {
-      x = crop.x * scaleX;
-      y = crop.y * scaleY;
-      width = crop.width * scaleX;
-      height = crop.height * scaleY;
-    }
-
-    canvas.width = width;
-    canvas.height = height;
+    canvas.width = crop.width * scaleX;
+    canvas.height = crop.height * scaleY;
 
     ctx.drawImage(
       image,
-      x,
-      y,
-      width,
-      height,
+      crop.x * scaleX,
+      crop.y * scaleY,
+      crop.width * scaleX,
+      crop.height * scaleY,
       0,
       0,
       canvas.width,
@@ -117,6 +103,7 @@ export default function ImageCropper({ image, onCropComplete, onCancel }: ImageC
           <ReactCrop
             crop={crop}
             onChange={(c) => setCrop(c)}
+            onComplete={handleCropComplete}
             aspect={aspect}
           >
             <img
@@ -137,7 +124,7 @@ export default function ImageCropper({ image, onCropComplete, onCancel }: ImageC
           Cancelar
         </button>
         <button
-          onClick={() => crop && handleCropComplete(crop)}
+          onClick={() => crop && handleCropComplete(crop as PixelCrop)}
           disabled={!crop}
           style={{ padding: 10, background: "#0070f3", color: "white", border: "none", borderRadius: 4, cursor: "pointer" }}
         >
