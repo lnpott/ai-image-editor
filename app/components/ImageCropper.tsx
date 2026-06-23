@@ -103,7 +103,6 @@ export default function ImageCropper({ image, onCropComplete, onCancel }: ImageC
           <ReactCrop
             crop={crop}
             onChange={(c) => setCrop(c)}
-            onComplete={handleCropComplete}
             aspect={aspect}
           >
             <img
