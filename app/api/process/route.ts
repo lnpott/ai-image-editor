@@ -1,32 +1,6 @@
 import {NextResponse} from 'next/server';
 import sharp from 'sharp';
 
-async function removeBackground(buffer:Buffer){
- const apiKey = process.env.REMOVE_BG_API_KEY;
-
- if(!apiKey){
-  throw new Error('REMOVE_BG_API_KEY não configurada');
- }
-
- const form = new FormData();
- form.append('image_file', new Blob([buffer]), 'image.png');
- form.append('size','auto');
-
- const response = await fetch('https://api.remove.bg/v1.0/removebg',{
-  method:'POST',
-  headers:{
-   'X-Api-Key':apiKey
-  },
-  body:form
- });
-
- if(!response.ok){
-  throw new Error('Falha ao remover fundo');
- }
-
- return Buffer.from(await response.arrayBuffer());
-}
-
 export async function POST(req:Request){
  try{
   const {image,width,action}=await req.json();
@@ -38,7 +12,7 @@ export async function POST(req:Request){
   let buffer=Buffer.from(image.split(',')[1],'base64');
 
   if(action === 'remove_background'){
-   buffer = await removeBackground(buffer);
+   return NextResponse.json({error:'Funcionalidade de remoção de fundo temporariamente desabilitada. Use outras opções de edição.'},{status:400});
   }
 
   let editor = sharp(buffer);

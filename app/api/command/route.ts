@@ -5,8 +5,13 @@ export async function POST(req:Request){
  try{
   const {command}=await req.json();
 
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-  const model = genAI.getGenerativeModel({model:'gemini-2.0-flash'});
+  const apiKey = process.env.GEMINI_API_KEY;
+  if(!apiKey){
+   return NextResponse.json({error:'GEMINI_API_KEY não configurada'},{status:500});
+  }
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({model:'gemini-1.5-flash'});
 
   const result = await model.generateContent(`
 Classifique o comando em uma ação de editor de imagem.
