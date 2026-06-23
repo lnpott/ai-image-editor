@@ -24,9 +24,23 @@ export async function POST(req:Request){
   }
 
   if(action === 'enhance' || action === 'upscale'){
+   const targetWidth = width || 2400;
    editor = editor
-    .resize({width:width || 2400, withoutEnlargement:false})
-    .sharpen();
+    .resize({ 
+      width: targetWidth, 
+      withoutEnlargement: false,
+      kernel: 'lanczos3',
+      fit: 'inside'
+    })
+    .sharpen({
+      sigma: 1,
+      m1: 1,
+      m2: 2
+    })
+    .modulate({
+      brightness: 1.05,
+      saturation: 1.1
+    });
   }
 
   const output = await editor.toBuffer();

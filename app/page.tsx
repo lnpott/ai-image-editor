@@ -12,7 +12,7 @@ export default function Home() {
   const [showCropper, setShowCropper] = useState(false);
   const [showResult, setShowResult] = useState(false);
 
-  function loadImage(e: any) {
+  function loadImage(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -84,18 +84,26 @@ export default function Home() {
     if (!image) return;
     setLoading(true);
 
-    const response = await fetch("/api/process", {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({image,action:"remove_background"})
-    });
+    try {
+      const response = await fetch("/api/process", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({image,action:"remove_background"})
+      });
 
-    const data = await response.json();
-    if(data.image) {
-      setResult(data.image);
-      setShowResult(true);
+      const data = await response.json();
+      if(data.error) {
+        alert(data.error);
+      } else if(data.image) {
+        setResult(data.image);
+        setShowResult(true);
+      }
+    } catch (error) {
+      alert("Erro ao processar imagem");
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   async function upscale() {
