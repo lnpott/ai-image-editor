@@ -99,7 +99,7 @@ export default function ImageCropper({ image, onCropComplete, onCancel }: ImageC
       </div>
 
       <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
-        <div style={{ transform: `scale(${zoom})`, transformOrigin: "center" }}>
+        <div style={{ width: 500, height: 500, overflow: "hidden", position: "relative" }}>
           <ReactCrop
             crop={crop}
             onChange={(c) => setCrop(c)}
@@ -109,7 +109,7 @@ export default function ImageCropper({ image, onCropComplete, onCancel }: ImageC
               ref={imgRef}
               src={image}
               alt="Crop preview"
-              style={{ maxWidth: 500 }}
+              style={{ maxWidth: "none", transform: `scale(${zoom})`, transformOrigin: "center" }}
             />
           </ReactCrop>
         </div>
